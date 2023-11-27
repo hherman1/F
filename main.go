@@ -70,10 +70,9 @@ func main() {
 	win.Ctl("dumpdir " + pwd)
 	cmd := "dump F"
 	win.Ctl(cmd)
-	win.Fprintf("tag", "Get Kill Quit %% %s", strings.Join(args, " "))
+	win.Fprintf("tag", "Kill Quit +NoSuggest %% %s", strings.Join(args, " "))
 
 	needrun <- true
-	fmt.Println("started")
 	go events()
 	go runner()
 	r, err := acme.Log()
@@ -93,7 +92,6 @@ func events() {
 	for e := range win.EventChan() {
 		switch e.C2 {
 		case 'i', 'd':
-			fmt.Println("trigger needrun")
 			select {
 			case needrun <- true:
 			default:
@@ -156,7 +154,6 @@ func runner() {
 func runSetup(id int) {
 	// Running synchronously in runner, so no need to watch run.id.
 	// reset window
-	fmt.Println("run setup", id)
 	win.Addr(",")
 	win.Write("data", nil)
 	win.Addr("#0")
@@ -175,7 +172,6 @@ func readCmd() (string, error) {
 }
 
 func runBackground(id int) {
-	fmt.Println("exec run", id)
 	buf := make([]byte, 4096)
 	run.Lock()
 	line, err := readCmd()
@@ -223,7 +219,6 @@ func runBackground(id int) {
 	}
 	run.cmd = cmd
 	run.Unlock()
-	fmt.Println("reading command output", id)
 	bol := true
 	for {
 		n, err := r.Read(buf)
